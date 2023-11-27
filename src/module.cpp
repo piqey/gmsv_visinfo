@@ -2,8 +2,7 @@
 #include "GarrysMod/FactoryLoader.hpp"
 #include "eiface.h"
 
-const SourceSDK::FactoryLoader engine_loader("engine", false, IS_SERVERSIDE, "bin/");
-// const SourceSDK::ModuleLoader server_loader("server");
+const SourceSDK::FactoryLoader engine_loader("engine");
 
 IVEngineServer* engine_server = nullptr;
 
