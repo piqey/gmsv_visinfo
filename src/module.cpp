@@ -2,8 +2,8 @@
 #include "GarrysMod/FactoryLoader.hpp"
 #include "eiface.h"
 
-const SourceSDK::FactoryLoader engine_loader("engine");
-const SourceSDK::ModuleLoader server_loader("server");
+const SourceSDK::FactoryLoader engine_loader("engine", false, IS_SERVERSIDE, "bin/");
+// const SourceSDK::ModuleLoader server_loader("server");
 
 IVEngineServer* engine_server = nullptr;
 
@@ -11,7 +11,7 @@ IVEngineServer* engine_server = nullptr;
 // CLUSTERS
 //
 
-LUA_FUNCTION(GetClusterForOrigin)
+LUA_FUNCTION_STATIC(GetClusterForOrigin)
 {
 	LUA->CheckType(1, GarrysMod::Lua::Type::Vector);
 	LUA->PushNumber((double)engine_server->GetClusterForOrigin(LUA->GetVector(1)));
@@ -19,7 +19,7 @@ LUA_FUNCTION(GetClusterForOrigin)
 	return 1;
 }
 
-LUA_FUNCTION(GetClusterCount)
+LUA_FUNCTION_STATIC(GetClusterCount)
 {
 	LUA->PushNumber((double)engine_server->GetClusterCount());
 
@@ -30,7 +30,7 @@ LUA_FUNCTION(GetClusterCount)
 // AREAS
 //
 
-LUA_FUNCTION(GetArea)
+LUA_FUNCTION_STATIC(GetArea)
 {
 	LUA->CheckType(1, GarrysMod::Lua::Type::Vector);
 	LUA->PushNumber((double)engine_server->GetArea(LUA->GetVector(1)));
@@ -38,7 +38,7 @@ LUA_FUNCTION(GetArea)
 	return 1;
 }
 
-LUA_FUNCTION(CheckAreasConnected)
+LUA_FUNCTION_STATIC(CheckAreasConnected)
 {
 	LUA->CheckType(1, GarrysMod::Lua::Type::Number);
 	LUA->CheckType(2, GarrysMod::Lua::Type::Number);
@@ -59,19 +59,15 @@ GMOD_MODULE_OPEN()
 
 	LUA->PushCFunction(GetClusterForOrigin);
 	LUA->SetField(-2, "GetClusterForOrigin");
-	LUA->SetTable(-3);
 
 	LUA->PushCFunction(GetClusterCount);
 	LUA->SetField(-2, "GetClusterCount");
-	LUA->SetTable(-3);
 
 	LUA->PushCFunction(GetArea);
 	LUA->SetField(-2, "GetArea");
-	LUA->SetTable(-3);
 
 	LUA->PushCFunction(CheckAreasConnected);
 	LUA->SetField(-2, "CheckAreasConnected");
-	LUA->SetTable(-3);
 
 	LUA->Pop();
 
