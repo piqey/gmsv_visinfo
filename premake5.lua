@@ -39,6 +39,9 @@ CreateWorkspace({name = "visinfo", abi_compatible = false, path = "projects/" ..
 		IncludeSDKTier0()
 		IncludeSDKTier1()
 
+		files({"src/Types/*.c", "src/Types/*.cpp"})
+		files({"src/Types/*.h", "src/Types/*.hpp"})
+
 	--[[
 	CreateProject({serverside = false, source_path = "src", manual_files = true})
 		IncludeLuaShared()
