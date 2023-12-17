@@ -12,24 +12,24 @@ local gmcommon = _OPTIONS.gmcommon or os.getenv("GARRYSMOD_COMMON") or "./garrys
 include(gmcommon)
 
 CreateWorkspace({name = "visinfo", abi_compatible = false, path = "projects/" .. os.target() .. "/" .. _ACTION})
-	configurations {"Debug", "Release"}
-	platforms {"Static32", "Shared32", "Static64", "Shared64"}
+	configurations({"Debug", "Release"})
+	platforms({"Static32", "Shared32", "Static64", "Shared64"})
 
-	filter "platforms:Static32"
-		kind "StaticLib"
-		architecture "x32"
+	filter("platforms:Static32")
+		kind("StaticLib")
+		architecture("x32")
 
-	filter "platforms:Static64"
-		kind "StaticLib"
-		architecture "x64"
+	filter("platforms:Static64")
+		kind("StaticLib")
+		architecture("x64")
 
-	filter "platforms:Shared32"
-		kind "SharedLib"
-		architecture "x32"
+	filter("platforms:Shared32")
+		kind("SharedLib")
+		architecture("x32")
 
-	filter "platforms:Shared64"
-		kind "SharedLib"
-		architecture "x64"
+	filter("platforms:Shared64")
+		kind("SharedLib")
+		architecture("x64")
 
 	CreateProject({serverside = true, source_path = "src", manual_files = false})
 		IncludeLuaShared()
@@ -52,5 +52,5 @@ CreateWorkspace({name = "visinfo", abi_compatible = false, path = "projects/" ..
 			files({"src/win32/*.cpp", "src/win32/*.hpp"})
 
 		filter("system:linux or macosx")
+			files({"src/posix/*.cpp", "src/posix/*.hpp"})
 	--]]
-files({"src/posix/*.cpp", "src/posix/*.hpp"})
