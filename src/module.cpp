@@ -47,7 +47,6 @@ LUA_FUNCTION_STATIC(GetAllClusterBounds)
 
 // PVS
 
-#pragma warning(disable:6385)
 LUA_FUNCTION_STATIC(GetPVSForCluster)
 {
 	LUA->CheckType(1, GarrysMod::Lua::Type::Number);
@@ -56,47 +55,18 @@ LUA_FUNCTION_STATIC(GetPVSForCluster)
 	byte* buffer = new byte[size];
 
 	engine_server->GetPVSForCluster((int)LUA->GetNumber(1), size, buffer);
-	LuaPrint(LUA, "Got buffer size of", size);
+	// LuaPrint(LUA, "Got buffer size of", size);
+
+	LUA->PushUserType(new PVSData(size, buffer), PVSData::meta);
+
+	LUA->PushMetaTable(PVSData::meta);
+	LUA->SetMetaTable(-2);
 
 	LUA->CreateTable();
-
-	for (int i = 0; i < size; i++)
-	{
-		LUA->PushNumber((double)(i + 1));
-		LUA->PushNumber((double)buffer[i]);
-
-		LUA->SetTable(-3);
-	}
-
-	delete[] buffer;
+	LUA->SetFEnv(-2);
 
 	return 1;
 }
-
-//LUA_FUNCTION_STATIC(CheckOriginInPVS)
-//{
-//	LUA->CheckType(1, GarrysMod::Lua::Type::Vector);
-//	LUA->CheckType(2, VisInfo::Classes::PVS::meta);
-//
-//	VisInfo::Classes::PVS* pvs = LUA->GetUserType<VisInfo::Classes::PVS>(2, VisInfo::Classes::PVS::meta);
-//
-//	LUA->PushBool(engine_server->CheckOriginInPVS(LUA->GetVector(1), pvs->buffer, pvs->size));
-//
-//	return 1;
-//}
-
-//LUA_FUNCTION_STATIC(CheckBoxInPVS)
-//{
-//	LUA->CheckType(1, GarrysMod::Lua::Type::Vector);
-//	LUA->CheckType(2, GarrysMod::Lua::Type::Vector);
-//	LUA->CheckType(3, VisInfo::Classes::PVS::meta);
-//
-//	VisInfo::Classes::PVS* pvs = LUA->GetUserType<VisInfo::Classes::PVS>(3, VisInfo::Classes::PVS::meta);
-//
-//	LUA->PushBool(engine_server->CheckBoxInPVS(LUA->GetVector(1), LUA->GetVector(2), pvs->buffer, pvs->size));
-//
-//	return 1;
-//}
 
 // AREAS
 
@@ -125,6 +95,8 @@ GMOD_MODULE_OPEN()
 	if (engine_server == nullptr)
 		LUA->ThrowError("Failed to resolve server-side engine interface!");
 
+	PVSData::Initialize(LUA);
+
 	LUA->PushSpecial(GarrysMod::Lua::SPECIAL_GLOB);
 
 	// CLUSTERS
@@ -143,12 +115,6 @@ GMOD_MODULE_OPEN()
 	LUA->PushCFunction(GetPVSForCluster);
 	LUA->SetField(-2, "GetPVSForCluster");
 
-	//LUA->PushCFunction(CheckOriginInPVS);
-	//LUA->SetField(-2, "CheckOriginInPVS");
-
-	//LUA->PushCFunction(CheckBoxInPVS);
-	//LUA->SetField(-2, "CheckBoxInPVS");
-
 	// AREAS
 
 	LUA->PushCFunction(GetArea);
@@ -164,5 +130,7 @@ GMOD_MODULE_OPEN()
 
 GMOD_MODULE_CLOSE()
 {
+	PVSData::Deinitialize(LUA);
+
 	return 0;
 }
