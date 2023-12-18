@@ -17,6 +17,7 @@ namespace VisInfo::Types
 		// C++ stuff
 
 		const int size = 0;
+		const int total = 0;
 		const byte* buffer = nullptr;
 
 		int visible = 0;

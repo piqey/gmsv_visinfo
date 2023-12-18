@@ -5,12 +5,12 @@ namespace VisInfo::Types
 	// C++ type
 
 	PVSData::PVSData(int size, byte* buffer) :
-		size(size), buffer(buffer)
+		size(size), total(engine_server->GetClusterCount()), buffer(buffer)
 	{
 		if (buffer == nullptr)
 			throw std::runtime_error("PVS byte buffer is a null pointer!");
 
-		for (int i = 0; i < size * 8; i++)
+		for (int i = 0; i < total; i++)
 			if (buffer[i / 8] & (1 << (i % 8)))
 				visible++;
 	}
@@ -35,7 +35,7 @@ namespace VisInfo::Types
 		if (buffer == nullptr)
 			throw std::runtime_error("PVS byte buffer is a null pointer!");
 
-		if (cluster < 0 || cluster >= size * 8)
+		if (cluster < 0 || cluster >= total)
 			throw std::out_of_range("Cluster ID out of range!");
 
 		return (buffer[cluster / 8] & (1 << (cluster % 8))) != 0;
@@ -61,10 +61,10 @@ namespace VisInfo::Types
 		return 1;
 	}
 
-	LUA_FUNCTION_STATIC(len)
+	LUA_FUNCTION_STATIC(len) // TODO(?): Should this return the total amount visible or the total amount...?
 	{
 		LUA->CheckType(1, PVSData::meta);
-		LUA->PushNumber((double)LUA->GetUserType<PVSData>(1, PVSData::meta)->visible);
+		LUA->PushNumber((double)LUA->GetUserType<PVSData>(1, PVSData::meta)->visible /* total */);
 
 		return 1;
 	}
@@ -72,7 +72,9 @@ namespace VisInfo::Types
 	LUA_FUNCTION_STATIC(tostring)
 	{
 		LUA->CheckType(1, PVSData::meta);
-		LUA->PushFormattedString("[%s] with %f visible clusters", PVSData::typeName, (double)LUA->GetUserType<PVSData>(1, PVSData::meta)->visible);
+
+		PVSData* pvs = LUA->GetUserType<PVSData>(1, PVSData::meta);
+		LUA->PushFormattedString("[%s] %f total clusters, %f visible", PVSData::typeName, (double)pvs->total, (double)pvs->visible);
 
 		return 1;
 	}
@@ -107,7 +109,15 @@ namespace VisInfo::Types
 
 		try { LUA->PushBool(pvs->ContainsCluster((int)LUA->GetNumber(2))); }
 		catch (const std::runtime_error& e) { LUA->ThrowError(e.what()); }
-		catch (const std::out_of_range& e) { LUA->FormattedError("%s Use a number between %f and %f.", e.what(), 0.0, (double)(pvs->size - 1)); }
+		catch (const std::out_of_range& e) { LUA->FormattedError("%s Use a number between %f and %f.", e.what(), 0.0, (double)(pvs->total - 1)); }
+
+		return 1;
+	}
+
+	LUA_FUNCTION_STATIC(GetTotalClusters)
+	{
+		LUA->CheckType(1, PVSData::meta);
+		LUA->PushNumber(LUA->GetUserType<PVSData>(1, PVSData::meta)->total);
 
 		return 1;
 	}
