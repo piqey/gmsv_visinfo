@@ -5,7 +5,7 @@ PROJECT_GENERATOR_VERSION = 3
 newoption({
 	trigger = "gmcommon",
 	description = "Sets the path to the garrysmod_common (https://github.com/danielga/garrysmod_common) directory",
-    value = "../garrysmod_common"
+	value = "../garrysmod_common"
 })
 
 local gmcommon = _OPTIONS.gmcommon or os.getenv("GARRYSMOD_COMMON") or "./garrysmod_common"
