@@ -4,7 +4,6 @@
 #include "GarrysMod/FactoryLoader.hpp"
 #include "eiface.h"
 
-extern const SourceSDK::FactoryLoader engine_loader;
 extern IVEngineServer* engine_server;
 
 // extern inline void LuaPrint(GarrysMod::Lua::ILuaBase* L, char* msg);
