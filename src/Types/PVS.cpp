@@ -47,15 +47,30 @@ namespace VisInfo::Types
 	{
 		LUA->CheckType(1, PVSData::meta);
 
-		LUA->GetMetaTable(1);
-		LUA->Push(2);
-		LUA->RawGet(-2);
-
-		if (LUA->IsType(-1, GarrysMod::Lua::Type::NIL))
+		if (LUA->IsType(2, GarrysMod::Lua::Type::Number)) // Return boolean visibility when passed a cluster ID
 		{
-			LUA->GetFEnv(1);
+			LUA->GetMetaTable(1); // Get the PVS metatable
+			LUA->GetField(-1, "ContainsCluster"); // Push the ContainsCluster method onto the stack
+
+			LUA->Remove(-2); // Remove the metatable from the stack, keeping the function
+
+			LUA->Push(1); // Push the PVS userdata from the original function call
+			LUA->Push(2); // Push the second argument from the original function call
+
+			LUA->Call(2, 1); // Call the function; 2 arguments, 1 result
+		}
+		else // Return stuff normally
+		{
+			LUA->GetMetaTable(1);
 			LUA->Push(2);
 			LUA->RawGet(-2);
+
+			if (LUA->IsType(-1, GarrysMod::Lua::Type::NIL))
+			{
+				LUA->GetFEnv(1);
+				LUA->Push(2);
+				LUA->RawGet(-2);
+			}
 		}
 
 		return 1;

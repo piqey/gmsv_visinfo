@@ -55,7 +55,6 @@ LUA_FUNCTION_STATIC(GetPVSForCluster)
 	byte* buffer = new byte[size];
 
 	engine_server->GetPVSForCluster((int)LUA->GetNumber(1), size, buffer);
-	// LuaPrint(LUA, "Got buffer size of", size);
 
 	LUA->PushUserType(new PVSData(size, buffer), PVSData::meta);
 
