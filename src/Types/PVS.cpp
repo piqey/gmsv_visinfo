@@ -89,7 +89,7 @@ namespace VisInfo::Types
 		LUA->CheckType(1, PVSData::meta);
 
 		PVSData* pvs = LUA->GetUserType<PVSData>(1, PVSData::meta);
-		LUA->PushFormattedString("[%s] %f total clusters, %f visible", PVSData::typeName, (double)pvs->total, (double)pvs->visible);
+		LUA->PushFormattedString("[%s] %f/%f clusters visible", PVSData::typeName, (double)pvs->visible, (double)pvs->total);
 
 		return 1;
 	}
