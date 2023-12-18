@@ -1,6 +1,6 @@
 ---@diagnostic disable
 
-PROJECT_GENERATOR_VERSION = 2
+PROJECT_GENERATOR_VERSION = 3
 
 newoption({
 	trigger = "gmcommon",
@@ -12,25 +12,6 @@ local gmcommon = _OPTIONS.gmcommon or os.getenv("GARRYSMOD_COMMON") or "./garrys
 include(gmcommon)
 
 CreateWorkspace({name = "visinfo", abi_compatible = false, path = "projects/" .. os.target() .. "/" .. _ACTION})
-	configurations({"Debug", "Release"})
-	platforms({"Static32", "Shared32", "Static64", "Shared64"})
-
-	filter("platforms:Static32")
-		kind("StaticLib")
-		architecture("x32")
-
-	filter("platforms:Static64")
-		kind("StaticLib")
-		architecture("x64")
-
-	filter("platforms:Shared32")
-		kind("SharedLib")
-		architecture("x32")
-
-	filter("platforms:Shared64")
-		kind("SharedLib")
-		architecture("x64")
-
 	CreateProject({serverside = true, source_path = "src", manual_files = false})
 		IncludeLuaShared()
 		-- IncludeScanning()
