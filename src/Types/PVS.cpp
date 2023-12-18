@@ -162,6 +162,9 @@ namespace VisInfo::Types
 		L->PushCFunction(VisInfo::Types::ContainsCluster);
 		L->SetField(-2, "ContainsCluster");
 
+		L->PushCFunction(GetTotalClusters);
+		L->SetField(-2, "GetTotalClusters");
+
 		L->Pop();
 	}
 
