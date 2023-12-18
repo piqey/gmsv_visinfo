@@ -33,27 +33,16 @@ CreateWorkspace({name = "visinfo", abi_compatible = false, path = "projects/" ..
 
 	CreateProject({serverside = true, source_path = "src", manual_files = false})
 		IncludeLuaShared()
-		IncludeScanning()
-		IncludeDetouring()
+		-- IncludeScanning()
+		-- IncludeDetouring()
 		IncludeSDKCommon()
 		IncludeSDKTier0()
 		IncludeSDKTier1()
+		-- IncludeSDKTier2()
+		-- IncludeSDKTier3()
+		-- IncludeSDKMathlib()
+		-- IncludeSDKRaytrace()
+		-- IncludeSteamAPI()
 
-		files({"src/Types/*.c", "src/Types/*.cpp"})
-		files({"src/Types/*.h", "src/Types/*.hpp"})
-
-	--[[
-	CreateProject({serverside = false, source_path = "src", manual_files = true})
-		IncludeLuaShared()
-		IncludeScanning()
-		IncludeDetouring()
-		IncludeSDKCommon()
-		IncludeSDKTier0()
-		IncludeSDKTier1()
-
-		filter("system:windows")
-			files({"src/win32/*.cpp", "src/win32/*.hpp"})
-
-		filter("system:linux or macosx")
-			files({"src/posix/*.cpp", "src/posix/*.hpp"})
-	--]]
+		files({"src/**/*.c", "src/**/*.cpp"})
+		files({"src/**/*.h", "src/**/*.hpp"})
