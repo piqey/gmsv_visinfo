@@ -107,7 +107,7 @@ namespace VisInfo::Types
 
 		try { LUA->PushBool(pvs->ContainsCluster((int)LUA->GetNumber(2))); }
 		catch (const std::runtime_error& e) { LUA->ThrowError(e.what()); }
-		catch (const std::out_of_range& e) { LUA->FormattedError("%s Use a number between %f and %f.", e.what(), 0.0, (double)pvs->size); }
+		catch (const std::out_of_range& e) { LUA->FormattedError("%s Use a number between %f and %f.", e.what(), 0.0, (double)(pvs->size - 1)); }
 
 		return 1;
 	}
