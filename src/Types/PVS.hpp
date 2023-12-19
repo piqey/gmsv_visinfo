@@ -11,7 +11,7 @@ extern IVEngineServer* engine_server;
 
 namespace VisInfo::Types
 {
-	const struct PVSData
+	struct PVSData
 	{
 		// C++ stuff
 

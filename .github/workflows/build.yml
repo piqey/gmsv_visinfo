@@ -1,0 +1,84 @@
+name: 'build'
+on:
+  push:
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Acquire Submodules
+        run: git submodule update --init --recursive
+      - name: Acquire Premake
+        uses: abel0b/setup-premake@v2.3
+        with:
+          version: '5.0.0-beta2'
+      - name: Generate Project
+        run: premake5 --os=windows vs2022
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1.3.1
+        with:
+          msbuild-architecture: x64
+      - name: Build Project
+        run: |
+          msbuild ./projects/windows/vs2022/visinfo.sln /p:Configuration=Release /p:Platform=Win32
+          msbuild ./projects/windows/vs2022/visinfo.sln /p:Configuration=Release /p:Platform=x64
+      - name: Upload `gmsv_visinfo_win32.dll`
+        uses: actions/upload-artifact@v4
+        with:
+          name: gmsv_visinfo_win32
+          path: ./projects/windows/vs2022/x86/Release/gmsv_visinfo_win32.dll
+      - name: Upload `gmsv_visinfo_win64.dll`
+        uses: actions/upload-artifact@v4
+        with:
+          name: gmsv_visinfo_win64
+          path: ./projects/windows/vs2022/x86_64/Release/gmsv_visinfo_win64.dll
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Acquire Submodules
+        run: git submodule update --init --recursive
+      - name: Acquire Premake
+        uses: abel0b/setup-premake@v2.3
+        with:
+          version: '5.0.0-beta2'
+      - name: Generate Project
+        run: premake5 --os=linux gmake2
+      - name: Build Project
+        run: |
+          sudo apt-get install g++-multilib
+          make -C ./projects/linux/gmake2 config=release_x86
+          make -C ./projects/linux/gmake2 config=release_x86_64
+      - name: Upload `gmsv_visinfo_linux.dll`
+        uses: actions/upload-artifact@v4
+        with:
+          name: gmsv_visinfo_linux
+          path: ./projects/linux/gmake2/x86/Release/gmsv_visinfo_linux.dll
+      - name: Upload `gmsv_visinfo_linux64.dll`
+        uses: actions/upload-artifact@v4
+        with:
+          name: gmsv_visinfo_linux64
+          path: ./projects/linux/gmake2/x86_64/Release/gmsv_visinfo_linux64.dll
+  publish:
+    runs-on: ubuntu-latest
+    needs: [windows, linux]
+    steps:
+    #   - name: Checkout
+    #     uses: actions/checkout@v2
+      - name: Aggregate Binaries
+        uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+      - name: Create Release
+        id: create_release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "${{ github.ref_name }}"
+          prerelease: false
+          files: |
+            *.dll

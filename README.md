@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="https://github.com/piqey/gmsv_visinfo/actions/workflows/build.yml/badge.svg">
+</div>
+
 # Overview
 This module aims to enrich _Garry's Mod_'s Lua API by offering an intuitive Lua interface for several [visibility-related engine functions](https://developer.valvesoftware.com/wiki/PVS) not currently implemented in the game's native API. While some functions mirror their C++ counterparts, most have been restructured to align seamlessly with Lua scripting paradigms. Most notably, the adaptation of PVS byte buffers into user-friendly Lua userdata objects, complete with methods for easy access and manipulation of relevant data.
 
