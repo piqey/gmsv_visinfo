@@ -176,4 +176,4 @@ Determines whether a particular cluster exists within the PVS.
 #### Returns
 | Name | Type | Description |
 | :---: | :---: | :--- |
-| `total` | `number` | The total number of clusters accounted for by the PVS object's internal byte buffer (both visible and invisible). |
+| `total` | `number` | The total number of clusters accounted for by the PVS object's internal byte buffer (visibility notwithstanding). |
