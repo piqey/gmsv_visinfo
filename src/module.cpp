@@ -49,12 +49,12 @@ LUA_FUNCTION_STATIC(GetAllClusterBounds)
 
 LUA_FUNCTION_STATIC(GetPVSForCluster)
 {
-	LUA->CheckType(1, GarrysMod::Lua::Type::Number);
+	int cluster = (int)LUA->CheckNumber(1);
 
-	int size = (int)ceil(engine_server->GetClusterCount() / 8.0f);
+	int size = (int)ceil(0.125f * engine_server->GetClusterCount());
 	byte* buffer = new byte[size];
 
-	engine_server->GetPVSForCluster((int)LUA->GetNumber(1), size, buffer);
+	engine_server->GetPVSForCluster(cluster, size, buffer);
 
 	LUA->PushUserType(new PVSData(size, buffer), PVSData::meta);
 
@@ -79,10 +79,10 @@ LUA_FUNCTION_STATIC(GetArea)
 
 LUA_FUNCTION_STATIC(CheckAreasConnected)
 {
-	LUA->CheckType(1, GarrysMod::Lua::Type::Number);
-	LUA->CheckType(2, GarrysMod::Lua::Type::Number);
+	int area1 = (int)LUA->CheckNumber(1);
+	int area2 = (int)LUA->CheckNumber(2);
 
-	LUA->PushNumber((double)engine_server->CheckAreasConnected((int)LUA->GetNumber(1), (int)LUA->GetNumber(2)));
+	LUA->PushNumber((double)engine_server->CheckAreasConnected(area1, area2));
 
 	return 1;
 }
@@ -90,9 +90,13 @@ LUA_FUNCTION_STATIC(CheckAreasConnected)
 GMOD_MODULE_OPEN()
 {
 	engine_server = engine_loader.GetInterface<IVEngineServer>(INTERFACEVERSION_VENGINESERVER);
+	debug_overlay = engine_loader.GetInterface<IVDebugOverlay>(VDEBUG_OVERLAY_INTERFACE_VERSION);
 
 	if (engine_server == nullptr)
 		LUA->ThrowError("Failed to resolve server-side engine interface!");
+
+	if (engine_server == nullptr)
+		LUA->ThrowError("Failed to resolve debug overlay interface!");
 
 	PVSData::Initialize(LUA);
 

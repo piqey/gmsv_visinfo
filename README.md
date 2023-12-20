@@ -128,7 +128,7 @@ Contains the following metamethods:
 ### `boolean` PVS:CheckOrigin(`Vector` origin)
 #### Description
 Determines whether a given point exists within the PVS.
-#### Parameters:
+#### Parameters
 | Name | Type | Description |
 | :---: | :---: | :--- |
 | `origin` | `Vector` | The position in the map to evaluate. |
@@ -157,7 +157,7 @@ Determines whether the given box is within the PVS at any point.
 ### `boolean` PVS:ContainsCluster(`number` cluster)
 #### Description
 Determines whether a particular cluster exists within the PVS.
-#### Parameters:
+#### Parameters
 | Name | Type | Description |
 | :---: | :---: | :--- |
 | `cluster` | `number` | The ID of the cluster to search for. |
@@ -177,3 +177,20 @@ Determines whether a particular cluster exists within the PVS.
 | Name | Type | Description |
 | :---: | :---: | :--- |
 | `total` | `number` | The total number of clusters accounted for by the PVS object's internal byte buffer (visibility notwithstanding). |
+
+---
+
+### `void` PVS:DebugOverlay(`Color` color, `number` duration)
+#### Description
+Shows colored boxes for a specified duration indicating the bounding boxes of each cluster visible with the PVS in question.
+> [!IMPORTANT]
+> In order to see anything, you must:
+> * Set `developer` to `2` in the game console
+> * Be the host of a listen server or singleplayer game
+
+> [!TIP]
+> Use transparent colors. A color alpha of `255` will produce completely opaque boxes, which are hardly conducive to an effective visual display. Try starting out with `40`.
+#### Parameters
+| Name | Type | Description |
+| :---: | :---: | :--- |
+| `color` | `Color` | The color the boxes should be drawn with. |

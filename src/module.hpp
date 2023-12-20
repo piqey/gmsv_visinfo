@@ -3,6 +3,7 @@
 #include "GarrysMod/Lua/Interface.h"
 #include "GarrysMod/FactoryLoader.hpp"
 #include "eiface.h"
+#include "engine/ivdebugoverlay.h"
 
 #include "Types/PVS.hpp"
 
@@ -27,4 +28,6 @@ inline void LuaPrint(GarrysMod::Lua::ILuaBase* L, char* msg, int num)
 }
 
 const SourceSDK::FactoryLoader engine_loader("engine");
+
 IVEngineServer* engine_server = nullptr;
+IVDebugOverlay* debug_overlay = nullptr;

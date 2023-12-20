@@ -41,6 +41,25 @@ namespace VisInfo::Types
 		return (buffer[cluster / 8] & (1 << (cluster % 8))) != 0;
 	}
 
+	void PVSData::DebugOverlay(int r, int g, int b, int a, float duration) const
+	{
+		bbox_t* bboxes = new bbox_t[total];
+
+		engine_server->GetAllClusterBounds(bboxes, total);
+
+		for (int i = 0; i < total; i++)
+			if (buffer[i / 8] & (1 << (i % 8)))
+			{
+				#pragma warning(suppress: 6385)
+				bbox_t& bbox = bboxes[i];
+				Vector center = 0.5f * (bbox.mins + bbox.maxs);
+
+				debug_overlay->AddBoxOverlay(center, bbox.mins - center, bbox.maxs - center, qZero, r, g, b, a, duration);
+			}
+		
+		delete[] bboxes;
+	}
+
 	// Lua UserType stuff
 
 	LUA_FUNCTION_STATIC(index)
@@ -118,11 +137,11 @@ namespace VisInfo::Types
 	LUA_FUNCTION_STATIC(ContainsCluster)
 	{
 		LUA->CheckType(1, PVSData::meta);
-		LUA->CheckNumber(2);
+		int cluster = (int)LUA->CheckNumber(2);
 
 		PVSData* pvs = LUA->GetUserType<PVSData>(1, PVSData::meta);
 
-		try { LUA->PushBool(pvs->ContainsCluster((int)LUA->GetNumber(2))); }
+		try { LUA->PushBool(pvs->ContainsCluster(cluster)); }
 		catch (const std::runtime_error& e) { LUA->ThrowError(e.what()); }
 		catch (const std::out_of_range& e) { LUA->FormattedError("%s Use a number between %f and %f.", e.what(), 0.0, (double)(pvs->total - 1)); }
 
@@ -135,6 +154,49 @@ namespace VisInfo::Types
 		LUA->PushNumber(LUA->GetUserType<PVSData>(1, PVSData::meta)->total);
 
 		return 1;
+	}
+
+	LUA_FUNCTION_STATIC(DebugOverlay)
+	{
+		LUA->CheckType(1, PVSData::meta);
+		LUA->CheckType(2, GarrysMod::Lua::Type::Table);
+		float duration = (float)LUA->CheckNumber(3);
+
+		LUA->PushSpecial(GarrysMod::Lua::SPECIAL_GLOB); // Push _G onto the stack
+		LUA->GetField(-1, "IsColor"); // Push the IsColor function from _G onto the stack
+
+		LUA->Remove(-2); // Remove _G from the stack, keeping IsColor
+
+		LUA->Push(2); // Push the color table onto the stack
+
+		LUA->Call(1, 1); // Call IsColor with 1 argument, 1 result
+
+		if (!LUA->GetBool(-1))
+			LUA->ThrowError("Second argument must be a valid Color object!");
+
+		LUA->Pop(1); // Pop the IsColor bool result off the stack
+
+		LUA->Push(2); // Push the color table onto the stack
+
+		LUA->GetField(-1, "r");
+		int r = (int)LUA->GetNumber(-1);
+		LUA->Pop(1);
+
+		LUA->GetField(-1, "g");
+		int g = (int)LUA->GetNumber(-1);
+		LUA->Pop(1);
+
+		LUA->GetField(-1, "b");
+		int b = (int)LUA->GetNumber(-1);
+		LUA->Pop(1);
+
+		LUA->GetField(-1, "a");
+		int a = (int)LUA->GetNumber(-1);
+		LUA->Pop(2); // Also pop the color table off the stack
+
+		LUA->GetUserType<PVSData>(1, PVSData::meta)->DebugOverlay(r, g, b, a, duration);
+
+		return 0;
 	}
 
 	const char* PVSData::typeName = "PVS";
@@ -164,6 +226,9 @@ namespace VisInfo::Types
 
 		L->PushCFunction(GetTotalClusters);
 		L->SetField(-2, "GetTotalClusters");
+
+		L->PushCFunction(VisInfo::Types::DebugOverlay);
+		L->SetField(-2, "DebugOverlay");
 
 		L->Pop();
 	}
