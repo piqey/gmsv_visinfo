@@ -95,7 +95,7 @@ GMOD_MODULE_OPEN()
 	if (engine_server == nullptr)
 		LUA->ThrowError("Failed to resolve server-side engine interface!");
 
-	if (engine_server == nullptr)
+	if (debug_overlay == nullptr)
 		LUA->ThrowError("Failed to resolve debug overlay interface!");
 
 	PVSData::Initialize(LUA);
