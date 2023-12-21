@@ -26,6 +26,8 @@ namespace VisInfo::Types
 		int visible = 0;
 
 		PVSData(int size, byte* buffer);
+		PVSData(PVSData&& pvs) noexcept;
+
 		~PVSData();
 
 		bool CheckOrigin(Vector origin) const;

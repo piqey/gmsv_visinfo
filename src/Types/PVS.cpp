@@ -15,6 +15,12 @@ namespace VisInfo::Types
 				visible++;
 	}
 
+	PVSData::PVSData(PVSData&& old) noexcept :
+		size(old.size), buffer(old.buffer), total(old.total), visible(old.visible)
+	{
+		old.buffer = nullptr;
+	}
+
 	PVSData::~PVSData()
 	{
 		delete[] buffer;
