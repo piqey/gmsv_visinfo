@@ -205,3 +205,4 @@ Shows colored boxes for a specified duration indicating the bounding boxes of ea
 | Name | Type | Description |
 | :---: | :---: | :--- |
 | `color` | `Color` | The color the boxes should be drawn with. |
+| `duration` | `number` | The length of time (in seconds) that the overlay should persist before it disappears. |
