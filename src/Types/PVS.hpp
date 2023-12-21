@@ -19,6 +19,8 @@ namespace VisInfo::Types
 	{
 		// C++ stuff
 
+		static PVSData FromCluster(int cluster);
+
 		const int size = 0;
 		const int total = 0;
 		const byte* buffer = nullptr;

@@ -4,6 +4,16 @@ namespace VisInfo::Types
 {
 	// C++ type
 
+	PVSData PVSData::FromCluster(int cluster)
+	{
+		int size = (int)ceil(0.125f * engine_server->GetClusterCount());
+		byte* buffer = new byte[size];
+
+		engine_server->GetPVSForCluster(cluster, size, buffer);
+
+		return PVSData(size, buffer);
+	}
+
 	PVSData::PVSData(int size, byte* buffer) :
 		size(size), total(engine_server->GetClusterCount()), buffer(buffer)
 	{
@@ -180,21 +190,21 @@ namespace VisInfo::Types
 		if (!LUA->GetBool(-1))
 			LUA->ThrowError("Second argument must be a valid Color object!");
 
-		LUA->Pop(1); // Pop the IsColor bool result off the stack
+		LUA->Pop(); // Pop the IsColor bool result off the stack
 
 		LUA->Push(2); // Push the color table onto the stack
 
 		LUA->GetField(-1, "r");
 		int r = (int)LUA->GetNumber(-1);
-		LUA->Pop(1);
+		LUA->Pop();
 
 		LUA->GetField(-1, "g");
 		int g = (int)LUA->GetNumber(-1);
-		LUA->Pop(1);
+		LUA->Pop();
 
 		LUA->GetField(-1, "b");
 		int b = (int)LUA->GetNumber(-1);
-		LUA->Pop(1);
+		LUA->Pop();
 
 		LUA->GetField(-1, "a");
 		int a = (int)LUA->GetNumber(-1);

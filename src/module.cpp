@@ -51,12 +51,7 @@ LUA_FUNCTION_STATIC(GetPVSForCluster)
 {
 	int cluster = (int)LUA->CheckNumber(1);
 
-	int size = (int)ceil(0.125f * engine_server->GetClusterCount());
-	byte* buffer = new byte[size];
-
-	engine_server->GetPVSForCluster(cluster, size, buffer);
-
-	LUA->PushUserType(new PVSData(size, buffer), PVSData::meta);
+	LUA->PushUserType(new PVSData(PVSData::FromCluster(cluster)), PVSData::meta);
 
 	LUA->PushMetaTable(PVSData::meta);
 	LUA->SetMetaTable(-2);
