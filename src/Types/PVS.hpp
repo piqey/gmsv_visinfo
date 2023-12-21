@@ -10,8 +10,8 @@ extern IVDebugOverlay* debug_overlay;
 
 const QAngle qZero; // I don't know why vec3_angle is unresolved
 
-// extern inline void LuaPrint(GarrysMod::Lua::ILuaBase* L, char* msg);
-// extern inline void LuaPrint(GarrysMod::Lua::ILuaBase* L, char* msg, int num);
+ extern inline void LuaPrint(GarrysMod::Lua::ILuaBase* L, char* msg);
+ extern inline void LuaPrint(GarrysMod::Lua::ILuaBase* L, char* msg, int num);
 
 namespace VisInfo::Types
 {
@@ -28,6 +28,8 @@ namespace VisInfo::Types
 		int visible = 0;
 
 		PVSData(int size, byte* buffer);
+		PVSData(int size, byte* buffer, int total);
+
 		PVSData(PVSData&& pvs) noexcept;
 
 		~PVSData();
@@ -37,6 +39,13 @@ namespace VisInfo::Types
 		bool ContainsCluster(int cluster) const;
 
 		void DebugOverlay(int r, int g, int b, int a, float duration) const;
+
+		PVSData operator-() const;
+
+		PVSData operator+(const PVSData& b) const;
+		PVSData operator-(const PVSData& b) const;
+		PVSData operator*(const PVSData& b) const;
+		PVSData operator/(const PVSData& b) const;
 
 		// Lua UserType stuff
 

@@ -117,12 +117,23 @@ Determines whether `area1` flows into `area2` and vice versa. Result depends on 
 ## Description
 A `userdata` type representing a Potentially Visible Set (PVS) in the context of map visibility computations. Comes packaged with several methods for working with its associated visibility data.
 
-Contains the following metamethods:
+## Metamethods
+### General
 | Metamethod | Description | Syntax |
 | :---: | :--- | :--- |
 | __index | When passed number values, acts as an alias of `PVS:ContainsCluster`, returning a `boolean` | `pvs[147]` |
 | __len | Returns the number of clusters visible in the PVS in question | `#pvs` |
 | __tostring | Returns a string in the format of `"[PVS] X/Y clusters visible"` | `tostring(pvs)` |
+
+### Arithmetic
+`PVS` objects come complete with several arithmetic operator overloads for performing a number of basic bitwise operations on the byte buffers of said objects.
+| Metamethod | Description | Bitwise | Syntax |
+| :---: | :--- | :---: | :---: |
+| __add | Returns a `PVS` with all the clusters from both of the two `PVS` objects provided | `A \| B` | `A + B` |
+| __sub | Returns a copy of `A` with all clusters shared with `B` omitted | `A & ~B` | `A - B` |
+| __mul | Returns a `PVS` containing only clusters `A` and `B` have in common | `A & B` | `A * B` |
+| __div | Returns a `PVS` containing every cluster in the map *except* those `A` and `B` have in common | `~(A & B)` | `A / B` |
+| __unm | Returns an *inversion* of the `PVS` provided, containing any clusters the former didn't and not containing any it did | `~A` | `-A` |
 
 ## Methods
 ### `boolean` PVS:CheckOrigin(`Vector` origin)

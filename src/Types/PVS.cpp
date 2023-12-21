@@ -15,7 +15,13 @@ namespace VisInfo::Types
 	}
 
 	PVSData::PVSData(int size, byte* buffer) :
-		size(size), total(engine_server->GetClusterCount()), buffer(buffer)
+		PVSData::PVSData(size, buffer, engine_server->GetClusterCount())
+	{
+
+	}
+
+	PVSData::PVSData(int size, byte* buffer, int total) :
+		size(size), buffer(buffer), total(total)
 	{
 		if (buffer == nullptr)
 			throw std::runtime_error("PVS byte buffer is a null pointer!");
@@ -76,6 +82,68 @@ namespace VisInfo::Types
 		delete[] bboxes;
 	}
 
+	PVSData PVSData::operator-() const
+	{
+		byte* newBuffer = new byte[this->size];
+
+		for (int i = 0; i < this->size; i++)
+			newBuffer[i] = ~this->buffer[i];
+
+		return PVSData(this->size, newBuffer, this->total);
+	}
+
+	PVSData PVSData::operator+(const PVSData& b) const
+	{
+		if (this->total != b.total)
+			throw std::runtime_error("Cannot add PVS objects with different total cluster counts!");
+
+		byte* newBuffer = new byte[this->size];
+
+		for (int i = 0; i < this->size; i++)
+			newBuffer[i] = this->buffer[i] | b.buffer[i];
+
+		return PVSData(this->size, newBuffer, this->total);
+	}
+
+	PVSData PVSData::operator-(const PVSData& b) const
+	{
+		if (this->total != b.total)
+			throw std::runtime_error("Cannot subtract PVS objects with different total cluster counts!");
+
+		byte* newBuffer = new byte[this->size];
+
+		for (int i = 0; i < this->size; i++)
+			newBuffer[i] = this->buffer[i] & ~b.buffer[i];
+
+		return PVSData(this->size, newBuffer, this->total);
+	}
+
+	PVSData PVSData::operator*(const PVSData& b) const
+	{
+		if (this->total != b.total)
+			throw std::runtime_error("Cannot intersect PVS objects with different total cluster counts!");
+
+		byte* newBuffer = new byte[this->size];
+
+		for (int i = 0; i < this->size; i++)
+			newBuffer[i] = this->buffer[i] & b.buffer[i];
+
+		return PVSData(this->size, newBuffer, this->total);
+	}
+
+	PVSData PVSData::operator/(const PVSData& b) const
+	{
+		if (this->total != b.total)
+			throw std::runtime_error("Cannot get symmetric difference of PVS objects with different total cluster counts!");
+
+		byte* newBuffer = new byte[this->size];
+
+		for (int i = 0; i < this->size; i++)
+			newBuffer[i] = this->buffer[i] & ~(this->buffer[i] & b.buffer[i]);
+
+		return PVSData(this->size, newBuffer, this->total);
+	}
+
 	// Lua UserType stuff
 
 	LUA_FUNCTION_STATIC(index)
@@ -125,6 +193,66 @@ namespace VisInfo::Types
 
 		PVSData* pvs = LUA->GetUserType<PVSData>(1, PVSData::meta);
 		LUA->PushFormattedString("[%s] %f/%f clusters visible", PVSData::typeName, (double)pvs->visible, (double)pvs->total);
+
+		return 1;
+	}
+
+	LUA_FUNCTION_STATIC(unm)
+	{
+		LUA->CheckType(1, PVSData::meta);
+		LUA->PushUserType(new PVSData(-*LUA->GetUserType<PVSData>(1, PVSData::meta)), PVSData::meta);
+
+		return 1;
+	}
+
+	LUA_FUNCTION_STATIC(add)
+	{
+		LUA->CheckType(1, PVSData::meta);
+		LUA->CheckType(2, PVSData::meta);
+
+		PVSData* pvs_A = LUA->GetUserType<PVSData>(1, PVSData::meta);
+		PVSData* pvs_B = LUA->GetUserType<PVSData>(2, PVSData::meta);
+
+		LUA->PushUserType(new PVSData(*pvs_A + *pvs_B), PVSData::meta);
+
+		return 1;
+	}
+
+	LUA_FUNCTION_STATIC(sub)
+	{
+		LUA->CheckType(1, PVSData::meta);
+		LUA->CheckType(2, PVSData::meta);
+
+		PVSData* pvs_A = LUA->GetUserType<PVSData>(1, PVSData::meta);
+		PVSData* pvs_B = LUA->GetUserType<PVSData>(2, PVSData::meta);
+
+		LUA->PushUserType(new PVSData(*pvs_A - *pvs_B), PVSData::meta);
+
+		return 1;
+	}
+
+	LUA_FUNCTION_STATIC(mul)
+	{
+		LUA->CheckType(1, PVSData::meta);
+		LUA->CheckType(2, PVSData::meta);
+
+		PVSData* pvs_A = LUA->GetUserType<PVSData>(1, PVSData::meta);
+		PVSData* pvs_B = LUA->GetUserType<PVSData>(2, PVSData::meta);
+
+		LUA->PushUserType(new PVSData(*pvs_A * *pvs_B), PVSData::meta);
+
+		return 1;
+	}
+
+	LUA_FUNCTION_STATIC(div)
+	{
+		LUA->CheckType(1, PVSData::meta);
+		LUA->CheckType(2, PVSData::meta);
+
+		PVSData* pvs_A = LUA->GetUserType<PVSData>(1, PVSData::meta);
+		PVSData* pvs_B = LUA->GetUserType<PVSData>(2, PVSData::meta);
+
+		LUA->PushUserType(new PVSData(*pvs_A / *pvs_B), PVSData::meta);
 
 		return 1;
 	}
@@ -222,6 +350,8 @@ namespace VisInfo::Types
 	{
 		meta = L->CreateMetaTable(typeName);
 
+		// General Metamethods
+
 		L->PushCFunction(index);
 		L->SetField(-2, "__index");
 
@@ -230,6 +360,25 @@ namespace VisInfo::Types
 
 		L->PushCFunction(tostring);
 		L->SetField(-2, "__tostring");
+
+		// Arithmetic Metamethods
+
+		L->PushCFunction(unm);
+		L->SetField(-2, "__unm");
+
+		L->PushCFunction(add);
+		L->SetField(-2, "__add");
+
+		L->PushCFunction(sub);
+		L->SetField(-2, "__sub");
+
+		L->PushCFunction(mul);
+		L->SetField(-2, "__mul");
+
+		L->PushCFunction(div);
+		L->SetField(-2, "__div");
+
+		// Methods
 
 		L->PushCFunction(VisInfo::Types::CheckOrigin);
 		L->SetField(-2, "CheckOrigin");
