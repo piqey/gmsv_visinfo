@@ -10,8 +10,8 @@ extern IVDebugOverlay* debug_overlay;
 
 const QAngle qZero; // I don't know why vec3_angle is unresolved
 
- extern inline void LuaPrint(GarrysMod::Lua::ILuaBase* L, char* msg);
- extern inline void LuaPrint(GarrysMod::Lua::ILuaBase* L, char* msg, int num);
+extern inline void LuaPrint(GarrysMod::Lua::ILuaBase* L, char* msg);
+extern inline void LuaPrint(GarrysMod::Lua::ILuaBase* L, char* msg, int num);
 
 namespace VisInfo::Types
 {

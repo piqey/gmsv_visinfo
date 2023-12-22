@@ -197,6 +197,14 @@ namespace VisInfo::Types
 		return 1;
 	}
 
+	LUA_FUNCTION_STATIC(gc)
+	{
+		LUA->CheckType(1, PVSData::meta);
+		delete LUA->GetUserType<PVSData>(1, PVSData::meta);
+
+		return 0;
+	}
+
 	LUA_FUNCTION_STATIC(unm)
 	{
 		LUA->CheckType(1, PVSData::meta);
@@ -360,6 +368,9 @@ namespace VisInfo::Types
 
 		L->PushCFunction(tostring);
 		L->SetField(-2, "__tostring");
+
+		L->PushCFunction(gc);
+		L->SetField(-2, "__gc");
 
 		// Arithmetic Metamethods
 
